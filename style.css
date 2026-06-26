@@ -12,15 +12,17 @@ body {
 
 /* === COLOR TOKENS === */
 :root {
+  color-scheme: light;
+
   --midnight:  #013D5A;
   --lionsmane: #FCF3E3;
   --celeste:   #BDD3CE;
   --herb:      #708C69;
   --marigold:  #F4A25B;
 
-  --bg:         var(--lionsmane);
-  --text-dark:  var(--midnight);
-  --text-light: var(--lionsmane);
+  --bg:         #FCF3E3;
+  --text-dark:  #013D5A;
+  --text-light: #FCF3E3;
   --text-muted: #6E8A87;
 
   /* Category colors */
