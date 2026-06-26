@@ -51,6 +51,13 @@ body {
 .view { display: flex; flex-direction: column; }
 .view.hidden { display: none !important; }
 
+/* Dashboard fills exactly the screen — no scroll needed for default 8 cards */
+#view-dashboard {
+  height: 100dvh;
+  max-height: 100dvh;
+  overflow: hidden;
+}
+
 /* === HEADER === */
 .app-header {
   display: flex;
@@ -92,23 +99,27 @@ body {
 
 /* === CARDS GRID === */
 .cards-grid {
+  flex: 1;
+  min-height: 0;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 8px;
-  padding: 0 12px;
+  grid-template-rows: repeat(4, 1fr);
+  gap: 5px;
+  padding: 0 8px 5px;
+  overflow-y: auto; /* graceful scroll if custom cats added */
 }
 
 /* === CATEGORY CARD === */
 .category-card {
   position: relative;
-  padding: 14px 14px 12px;
-  aspect-ratio: 1 / 1;
+  padding: 10px 12px 8px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   cursor: pointer;
   overflow: hidden;
   border-radius: var(--radius);
+  min-height: 0;
   -webkit-tap-highlight-color: transparent;
   transition: transform 0.1s ease, filter 0.1s ease;
 }
@@ -133,14 +144,14 @@ body {
 }
 
 .card-count {
-  font-size: 72px;
+  font-size: 52px;
   font-weight: 700;
   line-height: 0.85;
   letter-spacing: -0.06em;
   align-self: flex-end;
 }
-.card-count.two-digits { font-size: 60px; }
-.card-count.three-digits { font-size: 44px; }
+.card-count.two-digits { font-size: 44px; }
+.card-count.three-digits { font-size: 32px; }
 
 .card-kalender   { background: var(--cat-kalender);  color: var(--text-light); }
 .card-räkningar  { background: var(--cat-räkningar); color: var(--text-light); }
@@ -151,7 +162,10 @@ body {
 .card-hund       { background: var(--cat-hund);      color: var(--text-dark);  }
 .card-tankar     { background: var(--cat-tankar);    color: var(--text-light); }
 
-/* === TODAY STRIP === */
+/* === TODAY STRIP (hidden in fullscreen dashboard) === */
+.today-strip { display: none; }
+
+/* === PLACEHOLDER TODAY STRIP === */
 .today-strip { margin: 16px 12px 0; }
 
 .today-strip-title {
@@ -494,8 +508,30 @@ body {
   outline-offset: 2px;
 }
 
-.optional-fields { margin-top: 16px; display: flex; flex-direction: column; gap: 10px; }
-.field-row { display: flex; flex-direction: column; gap: 4px; }
+/* + datum / + tid chips */
+.field-chips { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+
+.field-chip {
+  background: none;
+  border: 1.5px solid rgba(0,0,0,0.18);
+  border-radius: 100px;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  color: var(--text-muted);
+  transition: all 0.12s ease;
+}
+.field-chip.active {
+  border-color: var(--text-dark);
+  background: var(--text-dark);
+  color: white;
+}
+
+.field-wrap { margin-top: 10px; display: flex; flex-direction: column; gap: 4px; }
+.field-wrap.hidden { display: none; }
+
 .field-label {
   font-size: 11px;
   font-weight: 700;
@@ -737,6 +773,66 @@ body {
   font-size: 14px;
 }
 
+/* === CUSTOM CATEGORIES === */
+.custom-cats-list { margin-bottom: 14px; display: flex; flex-direction: column; gap: 6px; }
+
+.custom-cats-empty { font-size: 13px; color: var(--text-muted); padding: 8px 0; }
+
+.custom-cat-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: rgba(255,255,255,0.6);
+  border-radius: var(--radius);
+}
+.custom-cat-dot { width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; }
+.custom-cat-name { flex: 1; font-size: 15px; font-weight: 500; }
+.custom-cat-delete {
+  background: none;
+  border: none;
+  font-size: 14px;
+  cursor: pointer;
+  color: var(--text-muted);
+  padding: 2px 4px;
+  font-family: inherit;
+}
+
+.new-cat-form { display: flex; flex-direction: column; gap: 10px; margin-top: 4px; }
+
+.color-swatches { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.color-swatch {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.1s ease;
+  position: relative;
+}
+.color-swatch:active { transform: scale(0.9); }
+.color-swatch.selected::after {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  border: 2.5px solid var(--text-dark);
+}
+
+.add-cat-btn {
+  background: none;
+  border: 1.5px solid var(--text-dark);
+  border-radius: var(--radius);
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  color: var(--text-dark);
+  align-self: flex-start;
+}
+
 /* ================================
    DESKTOP (≥ 768px)
    ================================ */
@@ -800,8 +896,11 @@ body {
     padding-bottom: 40px;
   }
 
+  #view-dashboard { height: 100vh; max-height: 100vh; }
+
   .cards-grid {
     grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(2, 1fr);
   }
 
   .fab {

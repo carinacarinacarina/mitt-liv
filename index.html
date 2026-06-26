@@ -92,6 +92,16 @@
           <label class="settings-label">Kvällsrevision — tid</label>
           <input type="time" id="setting-review-time" class="settings-input" value="20:00">
         </div>
+        <div class="settings-group">
+          <label class="settings-label">Egna kategorier</label>
+          <div id="custom-cats-list" class="custom-cats-list"></div>
+          <div class="new-cat-form">
+            <input type="text" id="new-cat-name" class="settings-input" placeholder="Kategorinamn, t.ex. Träning">
+            <div class="color-swatches" id="color-swatches"></div>
+            <button class="add-cat-btn" onclick="addCustomCategory()">+ Lägg till kategori</button>
+          </div>
+        </div>
+
         <button class="save-btn full-width" onclick="saveSettings()">Spara inställningar</button>
 
         <div class="settings-group" style="margin-top:40px">
@@ -132,15 +142,17 @@
         <div class="category-chips" id="category-chips"></div>
       </div>
 
-      <div class="optional-fields">
-        <div class="field-row">
-          <label class="field-label">Datum / deadline</label>
-          <input type="date" id="item-date" class="field-input">
-        </div>
-        <div class="field-row">
-          <label class="field-label">Påminnelse</label>
-          <input type="datetime-local" id="item-reminder" class="field-input">
-        </div>
+      <div class="field-chips">
+        <button class="field-chip" id="chip-date" onclick="toggleField('date')">+ datum</button>
+        <button class="field-chip" id="chip-reminder" onclick="toggleField('reminder')">+ tid &amp; påminnelse</button>
+      </div>
+      <div class="field-wrap hidden" id="field-date">
+        <label class="field-label">Datum / deadline</label>
+        <input type="date" id="item-date" class="field-input">
+      </div>
+      <div class="field-wrap hidden" id="field-reminder">
+        <label class="field-label">Tid &amp; påminnelse</label>
+        <input type="datetime-local" id="item-reminder" class="field-input">
       </div>
 
       <div class="modal-actions">

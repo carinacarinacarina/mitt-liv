@@ -15,6 +15,21 @@ const CATEGORIES = [
 ];
 
 // ============================================================
+// PRESET COLORS FOR CUSTOM CATEGORIES
+// ============================================================
+const PRESET_COLORS = [
+  { color: '#7B5EA7', text: 'var(--text-light)' },
+  { color: '#D62839', text: 'var(--text-light)' },
+  { color: '#457B9D', text: 'var(--text-light)' },
+  { color: '#2D6A4F', text: 'var(--text-light)' },
+  { color: '#F4A261', text: 'var(--text-dark)'  },
+  { color: '#6B4226', text: 'var(--text-light)' },
+  { color: '#4A4E69', text: 'var(--text-light)' },
+  { color: '#E9C46A', text: 'var(--text-dark)'  },
+];
+let selectedPresetColor = PRESET_COLORS[0];
+
+// ============================================================
 // KEYWORDS FOR AUTO-CATEGORIZATION
 // ============================================================
 const KEYWORDS = {
@@ -55,7 +70,7 @@ function loadData() {
     const raw = localStorage.getItem('mitt-liv-v1');
     if (raw) return JSON.parse(raw);
   } catch (_) {}
-  return { items: [], settings: { name: '', reviewTime: '20:00', lastReview: null } };
+  return { items: [], settings: { name: '', reviewTime: '20:00', lastReview: null, customCategories: [] } };
 }
 
 function saveData() {
@@ -71,8 +86,12 @@ function uid() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2);
 }
 
+function getAllCategories() {
+  return [...CATEGORIES, ...(DATA.settings.customCategories || [])];
+}
+
 function getCat(id) {
-  return CATEGORIES.find(c => c.id === id) || CATEGORIES.find(c => c.id === 'tankar');
+  return getAllCategories().find(c => c.id === id) || CATEGORIES.find(c => c.id === 'tankar');
 }
 
 function svDate() {
@@ -267,6 +286,54 @@ function showSettings() {
   setActiveNav('settings');
   document.getElementById('setting-name').value = DATA.settings.name || '';
   document.getElementById('setting-review-time').value = DATA.settings.reviewTime || '20:00';
+  renderCustomCategories();
+  renderColorSwatches();
+}
+
+function renderCustomCategories() {
+  const list = document.getElementById('custom-cats-list');
+  const cats = DATA.settings.customCategories || [];
+  if (!cats.length) {
+    list.innerHTML = '<div class="custom-cats-empty">Inga egna kategorier ännu</div>';
+    return;
+  }
+  list.innerHTML = cats.map(cat => `
+    <div class="custom-cat-row">
+      <div class="custom-cat-dot" style="background:${cat.color}"></div>
+      <div class="custom-cat-name">${cat.label}</div>
+      <button class="custom-cat-delete" onclick="deleteCustomCategory('${cat.id}')">✕</button>
+    </div>`).join('');
+}
+
+function renderColorSwatches() {
+  document.getElementById('color-swatches').innerHTML = PRESET_COLORS.map((c, i) =>
+    `<button class="color-swatch ${c === selectedPresetColor ? 'selected' : ''}"
+      style="background:${c.color}" onclick="selectPresetColor(${i})"></button>`
+  ).join('');
+}
+
+function selectPresetColor(i) {
+  selectedPresetColor = PRESET_COLORS[i];
+  renderColorSwatches();
+}
+
+function addCustomCategory() {
+  const name = document.getElementById('new-cat-name').value.trim();
+  if (!name) { showToast('Ange ett namn för kategorin'); return; }
+  const id = 'c-' + name.toLowerCase().replace(/[^\w]/g, '-') + '-' + Date.now().toString(36);
+  if (!DATA.settings.customCategories) DATA.settings.customCategories = [];
+  DATA.settings.customCategories.push({ id, label: name, color: selectedPresetColor.color, text: selectedPresetColor.text, custom: true });
+  saveData();
+  document.getElementById('new-cat-name').value = '';
+  renderCustomCategories();
+  showToast(`"${name}" tillagd`);
+}
+
+function deleteCustomCategory(id) {
+  DATA.settings.customCategories = (DATA.settings.customCategories || []).filter(c => c.id !== id);
+  saveData();
+  renderCustomCategories();
+  showToast('Kategori borttagen');
 }
 
 function saveSettings() {
@@ -310,7 +377,7 @@ function renderDashboard() {
 
   // Cards
   const grid = document.getElementById('cards-grid');
-  grid.innerHTML = CATEGORIES.map(cat => {
+  grid.innerHTML = getAllCategories().map(cat => {
     const count = activeCount(cat.id);
     const items = catItems(cat.id).filter(x => !x.completed);
     const preview = items.length
@@ -467,6 +534,21 @@ function quickReminder(id) {
 // ============================================================
 let EDITING_ID = null;
 
+function toggleField(type) {
+  const wrap = document.getElementById('field-' + type);
+  const chip = document.getElementById('chip-' + type);
+  const opening = wrap.classList.contains('hidden');
+  wrap.classList.toggle('hidden', !opening);
+  chip.classList.toggle('active', opening);
+  if (opening) {
+    const inp = wrap.querySelector('input');
+    if (inp) setTimeout(() => inp.focus(), 60);
+  } else {
+    const inp = wrap.querySelector('input');
+    if (inp) inp.value = '';
+  }
+}
+
 function openModal(catId = null, editId = null) {
   EDITING_ID = editId;
   STATE.selectedCategoryForAdd = catId;
@@ -474,6 +556,12 @@ function openModal(catId = null, editId = null) {
   const txtEl  = document.getElementById('item-text');
   const dateEl = document.getElementById('item-date');
   const remEl  = document.getElementById('item-reminder');
+
+  // Reset field visibility
+  ['date', 'reminder'].forEach(t => {
+    document.getElementById('field-' + t).classList.add('hidden');
+    document.getElementById('chip-' + t).classList.remove('active');
+  });
 
   if (editId) {
     const item = DATA.items.find(x => x.id === editId);
@@ -484,6 +572,14 @@ function openModal(catId = null, editId = null) {
       STATE.selectedCategoryForAdd = item.category;
       document.getElementById('modal-title').textContent = 'Redigera';
       showSuggestion(item.category);
+      if (item.date) {
+        document.getElementById('field-date').classList.remove('hidden');
+        document.getElementById('chip-date').classList.add('active');
+      }
+      if (item.reminder) {
+        document.getElementById('field-reminder').classList.remove('hidden');
+        document.getElementById('chip-reminder').classList.add('active');
+      }
     }
   } else {
     txtEl.value  = '';
@@ -529,7 +625,7 @@ function selectChip(catId) {
 }
 
 function buildChips() {
-  document.getElementById('category-chips').innerHTML = CATEGORIES.map(cat =>
+  document.getElementById('category-chips').innerHTML = getAllCategories().map(cat =>
     `<button class="category-chip ${STATE.selectedCategoryForAdd === cat.id ? 'selected' : ''}"
        style="background:${cat.color};color:${cat.text}"
        onclick="selectChip('${cat.id}')">${cat.label}</button>`
@@ -547,7 +643,12 @@ function onTextInput(el) {
 
   const detected = extractDate(text);
   const dateEl = document.getElementById('item-date');
-  if (detected && !dateEl.value) dateEl.value = detected;
+  if (detected && !dateEl.value) {
+    dateEl.value = detected;
+    if (document.getElementById('field-date').classList.contains('hidden')) {
+      toggleField('date');
+    }
+  }
 }
 
 function saveItem() {
