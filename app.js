@@ -4,28 +4,28 @@
 // CATEGORIES
 // ============================================================
 const CATEGORIES = [
-  { id: 'kalender',  label: 'Kalender',  color: 'var(--cat-kalender)',  text: 'var(--text-dark)'  },
-  { id: 'räkningar', label: 'Räkningar', color: 'var(--cat-räkningar)', text: 'var(--text-dark)'  },
-  { id: 'barn',      label: 'Barn',      color: 'var(--cat-barn)',      text: 'var(--text-light)' },
-  { id: 'inköp',     label: 'Inköp',     color: 'var(--cat-inköp)',     text: 'var(--text-dark)'  },
-  { id: 'att-göra',  label: 'Att göra',  color: 'var(--cat-att-göra)',  text: 'var(--text-light)' },
-  { id: 'semester',  label: 'Semester',  color: 'var(--cat-semester)',  text: 'var(--text-light)' },
-  { id: 'hund',      label: 'Hund',      color: 'var(--cat-hund)',      text: 'var(--text-dark)'  },
-  { id: 'tankar',    label: 'Tankar',    color: 'var(--cat-tankar)',     text: 'var(--text-light)' },
+  { id: 'kalender',  label: 'Kalender',  color: '#BDD3CE', text: '#013D5A' },
+  { id: 'räkningar', label: 'Räkningar', color: '#F4A25B', text: '#013D5A' },
+  { id: 'barn',      label: 'Barn',      color: '#708C69', text: '#FCF3E3' },
+  { id: 'inköp',     label: 'Inköp',     color: '#BDD3CE', text: '#013D5A' },
+  { id: 'att-göra',  label: 'Att göra',  color: '#013D5A', text: '#FCF3E3' },
+  { id: 'semester',  label: 'Semester',  color: '#708C69', text: '#FCF3E3' },
+  { id: 'hund',      label: 'Hund',      color: '#F4A25B', text: '#013D5A' },
+  { id: 'tankar',    label: 'Tankar',    color: '#013D5A', text: '#FCF3E3' },
 ];
 
 // ============================================================
 // PRESET COLORS FOR CUSTOM CATEGORIES
 // ============================================================
 const PRESET_COLORS = [
-  { color: '#708C69', text: 'var(--text-light)' },
-  { color: '#F4A25B', text: 'var(--text-dark)'  },
-  { color: '#BDD3CE', text: 'var(--text-dark)'  },
-  { color: '#013D5A', text: 'var(--text-light)' },
-  { color: '#7B5EA7', text: 'var(--text-light)' },
-  { color: '#D62839', text: 'var(--text-light)' },
-  { color: '#457B9D', text: 'var(--text-light)' },
-  { color: '#E9C46A', text: 'var(--text-dark)'  },
+  { color: '#708C69', text: '#FCF3E3' },
+  { color: '#F4A25B', text: '#013D5A' },
+  { color: '#BDD3CE', text: '#013D5A' },
+  { color: '#013D5A', text: '#FCF3E3' },
+  { color: '#7B5EA7', text: '#FCF3E3' },
+  { color: '#D62839', text: '#FCF3E3' },
+  { color: '#457B9D', text: '#FCF3E3' },
+  { color: '#E9C46A', text: '#013D5A' },
 ];
 let selectedPresetColor = PRESET_COLORS[0];
 
@@ -513,7 +513,7 @@ function renderCategoryView(catId) {
   const cat = getCat(catId);
   const header = document.getElementById('category-header');
   header.style.background = cat.color;
-  header.style.color = cat.text;
+  header.style.color      = cat.text;
   document.getElementById('category-title').textContent = cat.label;
   document.getElementById('category-count-badge').textContent = activeCount(catId);
   document.getElementById('cat-add-btn').style.color = 'inherit';
