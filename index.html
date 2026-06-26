@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta name="theme-color" content="#E0DBD2">
+  <meta name="theme-color" content="#FCF3E3">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <title>Mitt Liv</title>
+  <title>Vardagsliv:ish</title>
   <link rel="stylesheet" href="style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -15,7 +15,7 @@
 <div id="app">
 
   <nav class="side-nav" id="side-nav">
-    <div class="nav-logo">ML</div>
+    <div class="nav-logo">V:i</div>
     <button class="nav-btn active" data-view="dashboard" onclick="showDashboard()">
       <span class="nav-icon">⊞</span>
       <span class="nav-label">Hem</span>
@@ -36,18 +36,39 @@
     <div id="view-dashboard" class="view">
       <header class="app-header">
         <div class="header-title">
-          <h1 id="header-greeting">Mitt Liv</h1>
+          <h1 class="app-title">Vardagsliv<span class="title-sep">:</span>ish</h1>
           <p class="header-date" id="header-date"></p>
         </div>
         <button class="header-action-btn" onclick="startReview()" title="Kvällsrevision">◎</button>
       </header>
 
-      <div class="cards-grid" id="cards-grid"></div>
+      <!-- Inline add form -->
+      <div class="add-section">
+        <div class="add-section-label">Lägg till</div>
+        <textarea id="inline-text" class="inline-textarea" placeholder="Skriv…" rows="2" oninput="onInlineInput(this)"></textarea>
+        <div class="field-chips">
+          <button class="field-chip" id="inline-chip-date" onclick="toggleInlineField('date')">+ datum</button>
+          <button class="field-chip" id="inline-chip-tid" onclick="toggleInlineField('tid')">+ tid</button>
+        </div>
+        <div class="field-wrap hidden" id="inline-field-date">
+          <label class="field-label">Datum / deadline</label>
+          <input type="date" id="inline-date" class="field-input">
+        </div>
+        <div class="field-wrap hidden" id="inline-field-tid">
+          <label class="field-label">Tid &amp; påminnelse</label>
+          <input type="datetime-local" id="inline-tid" class="field-input">
+        </div>
+        <button class="save-btn inline-save-btn" onclick="saveInlineItem()">Spara</button>
+      </div>
 
-      <div class="today-strip" id="today-strip"></div>
+      <!-- Category filter grid -->
+      <div class="cat-filter-grid" id="cat-filter-grid"></div>
+
+      <!-- Item list -->
+      <ul class="item-list" id="main-item-list"></ul>
     </div>
 
-    <!-- CATEGORY VIEW -->
+    <!-- CATEGORY VIEW (kept for edit flow) -->
     <div id="view-category" class="view hidden">
       <header class="category-header" id="category-header">
         <button class="back-btn" onclick="showDashboard()">←</button>
@@ -55,13 +76,11 @@
         <span id="category-count-badge" class="count-badge"></span>
         <button class="header-action-btn" onclick="openModal(STATE.selectedCategory)" id="cat-add-btn" title="Lägg till">+</button>
       </header>
-
       <div class="filter-bar">
         <button class="filter-btn active" onclick="setFilter(this,'active')">Aktiva</button>
         <button class="filter-btn" onclick="setFilter(this,'completed')">Klara</button>
         <button class="filter-btn" onclick="setFilter(this,'all')">Alla</button>
       </div>
-
       <ul class="item-list" id="item-list"></ul>
     </div>
 
@@ -115,9 +134,6 @@
         </div>
       </div>
     </div>
-
-    <!-- FAB -->
-    <button class="fab" onclick="openModal()" title="Lägg till (N)">+</button>
 
   </main>
 

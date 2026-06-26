@@ -4,27 +4,27 @@
 // CATEGORIES
 // ============================================================
 const CATEGORIES = [
-  { id: 'kalender',  label: 'Kalender',  color: 'var(--cat-kalender)',  text: 'var(--text-light)' },
-  { id: 'räkningar', label: 'Räkningar', color: 'var(--cat-räkningar)', text: 'var(--text-light)' },
-  { id: 'barn',      label: 'Barn',      color: 'var(--cat-barn)',      text: 'var(--text-dark)'  },
-  { id: 'inköp',     label: 'Inköp',     color: 'var(--cat-inköp)',     text: 'var(--text-light)' },
+  { id: 'kalender',  label: 'Kalender',  color: 'var(--cat-kalender)',  text: 'var(--text-dark)'  },
+  { id: 'räkningar', label: 'Räkningar', color: 'var(--cat-räkningar)', text: 'var(--text-dark)'  },
+  { id: 'barn',      label: 'Barn',      color: 'var(--cat-barn)',      text: 'var(--text-light)' },
+  { id: 'inköp',     label: 'Inköp',     color: 'var(--cat-inköp)',     text: 'var(--text-dark)'  },
   { id: 'att-göra',  label: 'Att göra',  color: 'var(--cat-att-göra)',  text: 'var(--text-light)' },
   { id: 'semester',  label: 'Semester',  color: 'var(--cat-semester)',  text: 'var(--text-light)' },
   { id: 'hund',      label: 'Hund',      color: 'var(--cat-hund)',      text: 'var(--text-dark)'  },
-  { id: 'tankar',    label: 'Tankar',    color: 'var(--cat-tankar)',    text: 'var(--text-light)' },
+  { id: 'tankar',    label: 'Tankar',    color: 'var(--cat-tankar)',     text: 'var(--text-light)' },
 ];
 
 // ============================================================
 // PRESET COLORS FOR CUSTOM CATEGORIES
 // ============================================================
 const PRESET_COLORS = [
+  { color: '#708C69', text: 'var(--text-light)' },
+  { color: '#F4A25B', text: 'var(--text-dark)'  },
+  { color: '#BDD3CE', text: 'var(--text-dark)'  },
+  { color: '#013D5A', text: 'var(--text-light)' },
   { color: '#7B5EA7', text: 'var(--text-light)' },
   { color: '#D62839', text: 'var(--text-light)' },
   { color: '#457B9D', text: 'var(--text-light)' },
-  { color: '#2D6A4F', text: 'var(--text-light)' },
-  { color: '#F4A261', text: 'var(--text-dark)'  },
-  { color: '#6B4226', text: 'var(--text-light)' },
-  { color: '#4A4E69', text: 'var(--text-light)' },
   { color: '#E9C46A', text: 'var(--text-dark)'  },
 ];
 let selectedPresetColor = PRESET_COLORS[0];
@@ -63,6 +63,7 @@ const STATE = {
   currentItemId: null,
   currentFilter: 'active',
   selectedCategoryForAdd: null,
+  activeFilter: null,  // category filter on main view (null = all)
 };
 
 function loadData() {
@@ -194,11 +195,6 @@ function catItems(catId) {
   return DATA.items.filter(x => x.category === catId);
 }
 
-function todayItems() {
-  const d = new Date().toISOString().split('T')[0];
-  return DATA.items.filter(x => !x.completed && x.date === d);
-}
-
 function overdueItems() {
   const today = new Date(); today.setHours(0, 0, 0, 0);
   return DATA.items.filter(x => {
@@ -235,7 +231,7 @@ function scheduleReminder(item) {
   setTimeout(() => {
     const cat = getCat(item.category);
     if (Notification.permission === 'granted') {
-      new Notification(`Mitt Liv — ${cat.label}`, { body: item.text });
+      new Notification(`Vardagsliv:ish — ${cat.label}`, { body: item.text });
     }
     showToast(`🔔 ${item.text}`);
   }, ms);
@@ -348,6 +344,7 @@ function clearAllData() {
   if (!confirm('Är du säker? All data raderas permanent.')) return;
   localStorage.removeItem('mitt-liv-v1');
   DATA = loadData();
+  STATE.activeFilter = null;
   showToast('All data raderad');
   showDashboard();
 }
@@ -371,65 +368,147 @@ function setFilter(btn, filter) {
 // RENDER: DASHBOARD
 // ============================================================
 function renderDashboard() {
-  const name = DATA.settings.name;
-  document.getElementById('header-greeting').textContent = name ? `Hej ${name}` : 'Mitt Liv';
   document.getElementById('header-date').textContent = svDate();
+  renderCatFilterGrid();
+  renderMainItemList();
+}
 
-  // Cards
-  const grid = document.getElementById('cards-grid');
+function setMainFilter(catId) {
+  STATE.activeFilter = STATE.activeFilter === catId ? null : catId;
+  renderCatFilterGrid();
+  renderMainItemList();
+}
+
+function renderCatFilterGrid() {
+  const grid = document.getElementById('cat-filter-grid');
+  if (!grid) return;
   grid.innerHTML = getAllCategories().map(cat => {
-    const count = activeCount(cat.id);
-    const items = catItems(cat.id).filter(x => !x.completed);
-    const preview = items.length
-      ? (items.find(x => x.date) || items[0]).text.slice(0, 48)
-      : 'Inga objekt';
-
-    const countCls = count >= 100 ? 'three-digits' : count >= 10 ? 'two-digits' : '';
-
-    return `<div class="category-card card-${cat.id}" onclick="showCategory('${cat.id}')">
-      <div>
-        <div class="card-label">${cat.label}</div>
-        <div class="card-sublabel">${preview}</div>
-      </div>
-      <div class="card-count ${countCls}">${count}</div>
-    </div>`;
+    const isActive = STATE.activeFilter === cat.id;
+    return `<button class="cat-filter-btn ${isActive ? 'active' : ''}"
+      style="background:${cat.color};color:${cat.text}"
+      onclick="setMainFilter('${cat.id}')">
+      ${cat.label}
+    </button>`;
   }).join('');
+}
 
-  // Today strip
-  const overdue  = overdueItems();
-  const today    = todayItems();
-  const upcoming = upcomingItems(3).filter(x => x.date !== new Date().toISOString().split('T')[0]);
-  const strip    = [...overdue, ...today, ...upcoming].slice(0, 10);
-  const el       = document.getElementById('today-strip');
+function renderMainItemList() {
+  const list = document.getElementById('main-item-list');
+  if (!list) return;
 
-  if (!strip.length) { el.innerHTML = ''; return; }
+  let items;
+  if (STATE.activeFilter) {
+    items = DATA.items.filter(x => x.category === STATE.activeFilter && !x.completed);
+  } else {
+    items = DATA.items.filter(x => !x.completed);
+  }
 
-  el.innerHTML = `<div class="today-strip-title">Snart &amp; förfallet</div>`
-    + strip.map(item => {
-      const cat  = getCat(item.category);
-      const info = formatDate(item.date);
-      return `<div class="today-item" onclick="openDetail('${item.id}')">
-        <div class="today-dot" style="background:${cat.color}"></div>
-        <div class="today-item-text">${item.text}</div>
-        <div class="today-item-meta ${info ? info.cls : ''}">${info ? info.text : ''}</div>
-      </div>`;
-    }).join('');
+  if (!items.length) {
+    const msg = STATE.activeFilter
+      ? 'Inga aktiva objekt i den här kategorin'
+      : 'Inga objekt än — skriv något ovan!';
+    list.innerHTML = `<li class="empty-state">${msg}</li>`;
+    return;
+  }
+
+  list.innerHTML = items.map(item => {
+    const cat  = getCat(item.category);
+    const info = item.date ? formatDate(item.date) : null;
+    const dateTag = info ? `<span class="item-date-tag ${info.cls}">${info.text}</span>` : '';
+    const catPill = !STATE.activeFilter
+      ? `<span class="item-cat-pill" style="background:${cat.color};color:${cat.text}">${cat.label}</span>`
+      : '';
+    const hasMeta = info || !STATE.activeFilter;
+
+    return `<li class="item-row ${item.completed ? 'completed' : ''}" onclick="openDetail('${item.id}')">
+      <div class="item-checkbox" onclick="event.stopPropagation();tapCheckMain('${item.id}')"></div>
+      <div class="item-content">
+        <div class="item-text">${item.text}</div>
+        ${hasMeta ? `<div class="item-meta">${dateTag}${catPill}</div>` : ''}
+      </div>
+    </li>`;
+  }).join('');
+}
+
+function tapCheckMain(id) {
+  toggleComplete(id);
+  renderMainItemList();
 }
 
 // ============================================================
-// RENDER: CATEGORY VIEW
+// INLINE ADD FORM
+// ============================================================
+function toggleInlineField(type) {
+  const wrap = document.getElementById('inline-field-' + type);
+  const chip = document.getElementById('inline-chip-' + type);
+  if (!wrap || !chip) return;
+  const opening = wrap.classList.contains('hidden');
+  wrap.classList.toggle('hidden', !opening);
+  chip.classList.toggle('active', opening);
+  if (opening) {
+    const inp = wrap.querySelector('input');
+    if (inp) setTimeout(() => inp.focus(), 60);
+  } else {
+    const inp = wrap.querySelector('input');
+    if (inp) inp.value = '';
+  }
+}
+
+function onInlineInput(el) {
+  // Auto-extract date from text
+  const text = el.value;
+  if (text.length < 3) return;
+  const detected = extractDate(text);
+  const dateEl = document.getElementById('inline-date');
+  if (detected && dateEl && !dateEl.value) {
+    dateEl.value = detected;
+    const wrap = document.getElementById('inline-field-date');
+    const chip = document.getElementById('inline-chip-date');
+    if (wrap && wrap.classList.contains('hidden')) {
+      wrap.classList.remove('hidden');
+      if (chip) chip.classList.add('active');
+    }
+  }
+}
+
+function saveInlineItem() {
+  const text = document.getElementById('inline-text').value.trim();
+  if (!text) { showToast('Skriv något först!'); return; }
+
+  const category = STATE.activeFilter || guessCategory(text);
+  const date     = document.getElementById('inline-date').value || null;
+  const rem      = document.getElementById('inline-tid').value;
+  const reminder = rem ? rem + ':00' : null;
+
+  addItem({ text, category, date, reminder });
+  showToast(`Lagt till i ${getCat(category).label}`);
+  requestNotifPerm();
+
+  // Reset form
+  document.getElementById('inline-text').value = '';
+  document.getElementById('inline-date').value = '';
+  document.getElementById('inline-tid').value = '';
+  ['date', 'tid'].forEach(t => {
+    const wrap = document.getElementById('inline-field-' + t);
+    const chip = document.getElementById('inline-chip-' + t);
+    if (wrap) wrap.classList.add('hidden');
+    if (chip) chip.classList.remove('active');
+  });
+
+  renderMainItemList();
+}
+
+// ============================================================
+// RENDER: CATEGORY VIEW (legacy, kept for edit flow)
 // ============================================================
 function renderCategoryView(catId) {
   const cat = getCat(catId);
   const header = document.getElementById('category-header');
-
-  header.style.background = `var(--cat-${catId})`;
-  header.style.color = cat.text.includes('light') ? 'var(--text-light)' : 'var(--text-dark)';
-
+  header.style.background = cat.color;
+  header.style.color = cat.text;
   document.getElementById('category-title').textContent = cat.label;
   document.getElementById('category-count-badge').textContent = activeCount(catId);
   document.getElementById('cat-add-btn').style.color = 'inherit';
-
   renderItemList(catId);
 }
 
@@ -478,16 +557,9 @@ function renderReview() {
   const added    = DATA.items.filter(x => x.createdAt.startsWith(todayStr));
 
   let html = '';
-
-  if (overdue.length) {
-    html += section('Förfallna', overdue);
-  }
-  if (upcoming.length) {
-    html += section('Kommande 7 dagar', upcoming);
-  }
-  if (added.length) {
-    html += section('Tillagt idag', added);
-  }
+  if (overdue.length)  html += section('Förfallna', overdue);
+  if (upcoming.length) html += section('Kommande 7 dagar', upcoming);
+  if (added.length)    html += section('Tillagt idag', added);
 
   if (!html) {
     html = `<div class="review-empty">
@@ -511,7 +583,7 @@ function reviewRow(item) {
   const cat  = getCat(item.category);
   const info = item.date ? formatDate(item.date) : null;
   return `<div class="review-item">
-    <div class="today-dot" style="background:${cat.color};margin-top:4px;flex-shrink:0"></div>
+    <div class="today-dot" style="background:${cat.color}"></div>
     <div class="review-item-body">
       <div class="review-item-text">${item.text}</div>
       ${info ? `<div class="review-item-sub">${info.text}</div>` : ''}
@@ -557,7 +629,6 @@ function openModal(catId = null, editId = null) {
   const dateEl = document.getElementById('item-date');
   const remEl  = document.getElementById('item-reminder');
 
-  // Reset field visibility
   ['date', 'reminder'].forEach(t => {
     document.getElementById('field-' + t).classList.add('hidden');
     document.getElementById('chip-' + t).classList.remove('active');
@@ -682,7 +753,7 @@ function openDetail(id) {
   const cat = getCat(item.category);
 
   const badge = document.getElementById('detail-category-badge');
-  badge.textContent    = cat.label;
+  badge.textContent      = cat.label;
   badge.style.background = cat.color;
   badge.style.color      = cat.text;
 
@@ -738,7 +809,7 @@ function toggleCurrentItem() {
 // ============================================================
 function refresh() {
   if (STATE.view === 'dashboard') {
-    renderDashboard();
+    renderMainItemList();
   } else if (STATE.view === 'category') {
     renderItemList(STATE.selectedCategory);
     document.getElementById('category-count-badge').textContent = activeCount(STATE.selectedCategory);
@@ -772,7 +843,6 @@ document.addEventListener('keydown', e => {
 
   if (e.key === 'Escape') { closeModal(); closeDetailModal(); }
   if ((e.key === 'Enter' && (e.metaKey || e.ctrlKey)) && addOpen) saveItem();
-  if (e.key === 'n' && !inField && !addOpen) openModal();
 });
 
 // ============================================================
