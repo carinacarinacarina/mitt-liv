@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#E0DBD2">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <title>Mitt Liv</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<div id="app">
+
+  <nav class="side-nav" id="side-nav">
+    <div class="nav-logo">ML</div>
+    <button class="nav-btn active" data-view="dashboard" onclick="showDashboard()">
+      <span class="nav-icon">⊞</span>
+      <span class="nav-label">Hem</span>
+    </button>
+    <button class="nav-btn" data-view="review" onclick="startReview()">
+      <span class="nav-icon">◎</span>
+      <span class="nav-label">Revision</span>
+    </button>
+    <button class="nav-btn" data-view="settings" onclick="showSettings()">
+      <span class="nav-icon">◈</span>
+      <span class="nav-label">Inställningar</span>
+    </button>
+  </nav>
+
+  <main id="main-content">
+
+    <!-- DASHBOARD -->
+    <div id="view-dashboard" class="view">
+      <header class="app-header">
+        <div class="header-title">
+          <h1 id="header-greeting">Mitt Liv</h1>
+          <p class="header-date" id="header-date"></p>
+        </div>
+        <button class="header-action-btn" onclick="startReview()" title="Kvällsrevision">◎</button>
+      </header>
+
+      <div class="cards-grid" id="cards-grid"></div>
+
+      <div class="today-strip" id="today-strip"></div>
+    </div>
+
+    <!-- CATEGORY VIEW -->
+    <div id="view-category" class="view hidden">
+      <header class="category-header" id="category-header">
+        <button class="back-btn" onclick="showDashboard()">←</button>
+        <h2 id="category-title"></h2>
+        <span id="category-count-badge" class="count-badge"></span>
+        <button class="header-action-btn" onclick="openModal(STATE.selectedCategory)" id="cat-add-btn" title="Lägg till">+</button>
+      </header>
+
+      <div class="filter-bar">
+        <button class="filter-btn active" onclick="setFilter(this,'active')">Aktiva</button>
+        <button class="filter-btn" onclick="setFilter(this,'completed')">Klara</button>
+        <button class="filter-btn" onclick="setFilter(this,'all')">Alla</button>
+      </div>
+
+      <ul class="item-list" id="item-list"></ul>
+    </div>
+
+    <!-- REVIEW VIEW -->
+    <div id="view-review" class="view hidden">
+      <header class="app-header">
+        <div class="header-title">
+          <h1>Kvällsrevision</h1>
+          <p class="header-date" id="review-date"></p>
+        </div>
+        <button class="header-action-btn" onclick="showDashboard()">✕</button>
+      </header>
+      <div class="review-content" id="review-content"></div>
+    </div>
+
+    <!-- SETTINGS VIEW -->
+    <div id="view-settings" class="view hidden">
+      <header class="app-header">
+        <div class="header-title"><h1>Inställningar</h1></div>
+        <button class="header-action-btn" onclick="showDashboard()">✕</button>
+      </header>
+      <div class="settings-content">
+        <div class="settings-group">
+          <label class="settings-label">Ditt namn</label>
+          <input type="text" id="setting-name" class="settings-input" placeholder="Ditt namn">
+        </div>
+        <div class="settings-group">
+          <label class="settings-label">Kvällsrevision — tid</label>
+          <input type="time" id="setting-review-time" class="settings-input" value="20:00">
+        </div>
+        <button class="save-btn full-width" onclick="saveSettings()">Spara inställningar</button>
+
+        <div class="settings-group" style="margin-top:40px">
+          <label class="settings-label" style="color:var(--cat-räkningar)">Farlig zon</label>
+          <button class="danger-btn" onclick="clearAllData()">Rensa all data</button>
+        </div>
+
+        <div class="settings-group" style="margin-top:32px">
+          <label class="settings-label">Dela / Publicera</label>
+          <p class="settings-hint">Pusha repot till GitHub och aktivera GitHub Pages under Settings → Pages för att komma åt appen från valfri enhet via en URL.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- FAB -->
+    <button class="fab" onclick="openModal()" title="Lägg till (N)">+</button>
+
+  </main>
+
+  <!-- ADD / EDIT MODAL -->
+  <div id="add-modal" class="modal hidden">
+    <div class="modal-backdrop" onclick="closeModal()"></div>
+    <div class="modal-sheet">
+      <div class="modal-handle"></div>
+      <h3 class="modal-title" id="modal-title">Lägg till</h3>
+
+      <textarea id="item-text" class="item-textarea"
+        placeholder="Skriv vad som helst… jag kategoriserar åt dig"
+        rows="3" oninput="onTextInput(this)"></textarea>
+
+      <div class="category-suggestion" id="category-suggestion" style="display:none">
+        <span class="suggestion-label">Kategori:</span>
+        <span class="suggestion-name" id="suggestion-name"></span>
+        <button class="suggestion-change" onclick="toggleCategoryPicker()">Ändra</button>
+      </div>
+
+      <div class="category-picker hidden" id="category-picker">
+        <div class="category-chips" id="category-chips"></div>
+      </div>
+
+      <div class="optional-fields">
+        <div class="field-row">
+          <label class="field-label">Datum / deadline</label>
+          <input type="date" id="item-date" class="field-input">
+        </div>
+        <div class="field-row">
+          <label class="field-label">Påminnelse</label>
+          <input type="datetime-local" id="item-reminder" class="field-input">
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="cancel-btn" onclick="closeModal()">Avbryt</button>
+        <button class="save-btn" onclick="saveItem()">Spara</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DETAIL MODAL -->
+  <div id="detail-modal" class="modal hidden">
+    <div class="modal-backdrop" onclick="closeDetailModal()"></div>
+    <div class="modal-sheet">
+      <div class="modal-handle"></div>
+      <div class="detail-header">
+        <span class="detail-category-badge" id="detail-category-badge"></span>
+        <div class="detail-actions-top">
+          <button class="detail-edit-btn" onclick="editCurrentItem()">Redigera</button>
+          <button class="detail-delete-btn" onclick="deleteCurrentItem()">Ta bort</button>
+        </div>
+      </div>
+      <p class="detail-text" id="detail-text"></p>
+      <div class="detail-meta" id="detail-meta"></div>
+      <button class="detail-complete-btn" id="detail-complete-btn" onclick="toggleCurrentItem()">
+        Markera som klar
+      </button>
+    </div>
+  </div>
+
+  <!-- BOTTOM NAV (mobile) -->
+  <nav class="bottom-nav" id="bottom-nav">
+    <button class="nav-btn active" data-view="dashboard" onclick="showDashboard()">
+      <span class="nav-icon">⊞</span>
+      <span class="nav-label">Hem</span>
+    </button>
+    <button class="nav-btn" data-view="review" onclick="startReview()">
+      <span class="nav-icon">◎</span>
+      <span class="nav-label">Revision</span>
+    </button>
+    <button class="nav-btn" data-view="settings" onclick="showSettings()">
+      <span class="nav-icon">◈</span>
+      <span class="nav-label">Inst.</span>
+    </button>
+  </nav>
+
+  <div id="toast" class="toast hidden"></div>
+
+</div>
+<script src="app.js"></script>
+</body>
+</html>
