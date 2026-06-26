@@ -118,6 +118,14 @@ function formatDate(dateStr) {
 // ============================================================
 function guessCategory(text) {
   const lower = text.toLowerCase();
+
+  // Check if any category label appears in the text — custom categories first
+  const allCats = getAllCategories();
+  for (const cat of [...allCats].reverse()) {
+    if (lower.includes(cat.label.toLowerCase())) return cat.id;
+  }
+
+  // Fall back to keyword matching
   let best = null, bestScore = 0;
   for (const [cat, words] of Object.entries(KEYWORDS)) {
     const score = words.filter(w => lower.includes(w)).length;
