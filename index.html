@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
 <div id="app">
@@ -129,6 +130,20 @@
         </div>
 
         <div class="settings-group" style="margin-top:32px">
+          <label class="settings-label">Google Kalender</label>
+          <p class="settings-hint" style="margin-bottom:10px">
+            Kräver ett <strong>Google Cloud-projekt</strong> med Calendar API aktiverat och en OAuth 2.0-klient av typen "Webbapplikation".
+            Auktoriserad JavaScript-origin: <code>http://localhost:8000</code> (eller din publicerade URL).
+          </p>
+          <input type="text" id="setting-gcal-client-id" class="settings-input" placeholder="OAuth 2.0 Client ID (xxx.apps.googleusercontent.com)">
+          <div class="gcal-status-row" id="gcal-status-row">
+            <span class="gcal-dot" id="gcal-dot"></span>
+            <span id="gcal-status-text">Inte ansluten</span>
+            <button class="gcal-connect-btn" onclick="connectGCal()">Anslut</button>
+          </div>
+        </div>
+
+        <div class="settings-group" style="margin-top:12px">
           <label class="settings-label">Dela / Publicera</label>
           <p class="settings-hint">Pusha repot till GitHub och aktivera GitHub Pages under Settings → Pages för att komma åt appen från valfri enhet via en URL.</p>
         </div>
@@ -192,6 +207,9 @@
       </div>
       <p class="detail-text" id="detail-text"></p>
       <div class="detail-meta" id="detail-meta"></div>
+      <button class="gcal-btn hidden" id="detail-gcal-btn" onclick="addToGCal(STATE.currentItemId)">
+        Lägg till i Google Kalender
+      </button>
       <button class="detail-complete-btn" id="detail-complete-btn" onclick="toggleCurrentItem()">
         Markera som klar
       </button>

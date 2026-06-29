@@ -290,6 +290,9 @@ function showSettings() {
   setActiveNav('settings');
   document.getElementById('setting-name').value = DATA.settings.name || '';
   document.getElementById('setting-review-time').value = DATA.settings.reviewTime || '20:00';
+  const clientIdEl = document.getElementById('setting-gcal-client-id');
+  if (clientIdEl) clientIdEl.value = DATA.settings.googleClientId || '';
+  renderGCalStatus();
   renderCustomCategories();
   renderColorSwatches();
 }
@@ -343,6 +346,8 @@ function deleteCustomCategory(id) {
 function saveSettings() {
   DATA.settings.name = document.getElementById('setting-name').value.trim();
   DATA.settings.reviewTime = document.getElementById('setting-review-time').value;
+  const clientId = (document.getElementById('setting-gcal-client-id')?.value || '').trim();
+  if (clientId) DATA.settings.googleClientId = clientId;
   saveData();
   showToast('Inställningar sparade');
   showDashboard();
@@ -783,6 +788,16 @@ function openDetail(id) {
   btn.textContent = item.completed ? 'Markera som aktiv' : 'Markera som klar';
   btn.classList.toggle('is-done', item.completed);
 
+  const gcalBtn = document.getElementById('detail-gcal-btn');
+  if (gcalBtn) {
+    const hasDate = !!(item.date || item.reminder);
+    gcalBtn.classList.toggle('hidden', !hasDate);
+    gcalBtn.classList.toggle('synced', !!item.calendarEventId);
+    gcalBtn.textContent = item.calendarEventId
+      ? 'Uppdatera i Google Kalender'
+      : 'Lägg till i Google Kalender';
+  }
+
   document.getElementById('detail-modal').classList.remove('hidden');
 }
 
@@ -863,6 +878,126 @@ function restoreReminders() {
       scheduleReminder(item);
     }
   });
+}
+
+// ============================================================
+// GOOGLE CALENDAR INTEGRATION
+// ============================================================
+const GCAL = {
+  accessToken: null,
+  _pendingItemId: null,
+  SCOPE: 'https://www.googleapis.com/auth/calendar.events',
+};
+
+function gcalClientId() {
+  return (document.getElementById('setting-gcal-client-id')?.value || '').trim()
+    || (DATA.settings.googleClientId || '');
+}
+
+function connectGCal() {
+  const clientId = gcalClientId();
+  if (!clientId) { showToast('Ange ett Google Client ID först'); return; }
+  if (!window.google?.accounts?.oauth2) { showToast('Google API laddar, försök igen om ett ögonblick'); return; }
+
+  const tokenClient = google.accounts.oauth2.initTokenClient({
+    client_id: clientId,
+    scope: GCAL.SCOPE,
+    callback: (resp) => {
+      if (resp.error) { showToast('Inloggning misslyckades: ' + resp.error); return; }
+      GCAL.accessToken = resp.access_token;
+      DATA.settings.googleClientId = clientId;
+      saveData();
+      renderGCalStatus(true);
+      showToast('Google Kalender ansluten!');
+      if (GCAL._pendingItemId) {
+        const id = GCAL._pendingItemId;
+        GCAL._pendingItemId = null;
+        addToGCal(id);
+      }
+    },
+  });
+
+  tokenClient.requestAccessToken({ prompt: GCAL.accessToken ? '' : 'consent' });
+}
+
+function renderGCalStatus(connected) {
+  const dot  = document.getElementById('gcal-dot');
+  const text = document.getElementById('gcal-status-text');
+  if (!dot || !text) return;
+  if (connected || GCAL.accessToken) {
+    dot.classList.add('connected');
+    text.textContent = 'Ansluten';
+  } else {
+    dot.classList.remove('connected');
+    text.textContent = 'Inte ansluten';
+  }
+}
+
+async function addToGCal(itemId) {
+  if (!GCAL.accessToken) {
+    GCAL._pendingItemId = itemId;
+    connectGCal();
+    return;
+  }
+
+  const item = DATA.items.find(x => x.id === itemId);
+  if (!item || (!item.date && !item.reminder)) {
+    showToast('Objektet behöver ett datum för att läggas till i kalender');
+    return;
+  }
+
+  const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  let start, end;
+
+  if (item.reminder) {
+    const s = new Date(item.reminder);
+    const e = new Date(s.getTime() + 60 * 60 * 1000);
+    start = { dateTime: s.toISOString(), timeZone: tz };
+    end   = { dateTime: e.toISOString(), timeZone: tz };
+  } else {
+    start = { date: item.date };
+    end   = { date: item.date };
+  }
+
+  const cat = getCat(item.category);
+  const event = {
+    summary: item.text,
+    description: `Kategori: ${cat.label}\n\nSynkat från Vardagsliv:ish`,
+    start,
+    end,
+  };
+
+  const isUpdate = !!item.calendarEventId;
+  const url = isUpdate
+    ? `https://www.googleapis.com/calendar/v3/calendars/primary/events/${item.calendarEventId}`
+    : 'https://www.googleapis.com/calendar/v3/calendars/primary/events';
+
+  try {
+    const resp = await fetch(url, {
+      method: isUpdate ? 'PUT' : 'POST',
+      headers: {
+        'Authorization': `Bearer ${GCAL.accessToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(event),
+    });
+
+    if (resp.status === 401) {
+      GCAL.accessToken = null;
+      GCAL._pendingItemId = itemId;
+      connectGCal();
+      return;
+    }
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+
+    const data = await resp.json();
+    updateItem(itemId, { calendarEventId: data.id });
+    showToast(isUpdate ? 'Kalenderpost uppdaterad!' : 'Lagt till i Google Kalender!');
+    openDetail(itemId);
+  } catch (err) {
+    showToast('Kunde inte synka med Google Kalender');
+    console.error(err);
+  }
 }
 
 // ============================================================
