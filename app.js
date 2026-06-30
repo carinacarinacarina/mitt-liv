@@ -4,28 +4,28 @@
 // CATEGORIES
 // ============================================================
 const CATEGORIES = [
-  { id: 'kalender',  label: 'Kalender',  color: '#60A5FA', text: '#070A14', icon: 'calendar'      },
-  { id: 'räkningar', label: 'Räkningar', color: '#FBBF24', text: '#070A14', icon: 'receipt'        },
-  { id: 'barn',      label: 'Barn',      color: '#34D399', text: '#070A14', icon: 'heart'          },
-  { id: 'inköp',     label: 'Inköp',     color: '#A78BFA', text: '#070A14', icon: 'shopping-bag'  },
-  { id: 'att-göra',  label: 'Att göra',  color: '#818CF8', text: '#070A14', icon: 'check-circle'  },
-  { id: 'semester',  label: 'Semester',  color: '#38BDF8', text: '#070A14', icon: 'plane'          },
-  { id: 'hund',      label: 'Hund',      color: '#FB923C', text: '#070A14', icon: 'paw-print'     },
-  { id: 'tankar',    label: 'Tankar',    color: '#F472B6', text: '#070A14', icon: 'sparkles'       },
+  { id: 'kalender',  label: 'Kalender',  color: '#BDD3CE', text: '#013D5A' },
+  { id: 'räkningar', label: 'Räkningar', color: '#F4A25B', text: '#013D5A' },
+  { id: 'barn',      label: 'Barn',      color: '#708C69', text: '#FCF3E3' },
+  { id: 'inköp',     label: 'Inköp',     color: '#BDD3CE', text: '#013D5A' },
+  { id: 'att-göra',  label: 'Att göra',  color: '#013D5A', text: '#FCF3E3' },
+  { id: 'semester',  label: 'Semester',  color: '#708C69', text: '#FCF3E3' },
+  { id: 'hund',      label: 'Hund',      color: '#F4A25B', text: '#013D5A' },
+  { id: 'tankar',    label: 'Tankar',    color: '#013D5A', text: '#FCF3E3' },
 ];
 
 // ============================================================
 // PRESET COLORS FOR CUSTOM CATEGORIES
 // ============================================================
 const PRESET_COLORS = [
-  { color: '#60A5FA', text: '#070A14' },
-  { color: '#34D399', text: '#070A14' },
-  { color: '#FBBF24', text: '#070A14' },
-  { color: '#A78BFA', text: '#070A14' },
-  { color: '#F472B6', text: '#070A14' },
-  { color: '#FB923C', text: '#070A14' },
-  { color: '#38BDF8', text: '#070A14' },
-  { color: '#818CF8', text: '#070A14' },
+  { color: '#708C69', text: '#FCF3E3' },
+  { color: '#F4A25B', text: '#013D5A' },
+  { color: '#BDD3CE', text: '#013D5A' },
+  { color: '#013D5A', text: '#FCF3E3' },
+  { color: '#7B5EA7', text: '#FCF3E3' },
+  { color: '#D62839', text: '#FCF3E3' },
+  { color: '#457B9D', text: '#FCF3E3' },
+  { color: '#E9C46A', text: '#013D5A' },
 ];
 let selectedPresetColor = PRESET_COLORS[0];
 
@@ -156,25 +156,6 @@ function extractDate(text) {
     }
   }
   return null;
-}
-
-// ============================================================
-// CATEGORY ICONS (inline Lucide SVG paths)
-// ============================================================
-function catIcon(name, color) {
-  const PATHS = {
-    'calendar':     `<path d="M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/>`,
-    'receipt':      `<path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1z"/><path d="M10 7h4M10 11h8M10 15h4"/>`,
-    'heart':        `<path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>`,
-    'shopping-bag': `<path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" x2="21" y1="6" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/>`,
-    'check-circle': `<circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/>`,
-    'plane':        `<path d="M17.8 19.2 16 11l3.5-3.5C21 6 21 4 19 4s-2 1-3.5 2.5L11 8 2.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/>`,
-    'paw-print':    `<circle cx="11" cy="4" r="2"/><circle cx="18" cy="8" r="2"/><circle cx="20" cy="16" r="2"/><path d="M9 10a5 5 0 0 1 5 5v3.5a3.5 3.5 0 0 1-6.84 1.045Q6.52 17.48 4.46 16.84A3.5 3.5 0 0 1 5.5 10Z"/><circle cx="4.5" cy="8" r="2"/>`,
-    'sparkles':     `<path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/>`,
-    'tag':          `<path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z"/><circle cx="7.5" cy="7.5" r=".5" fill="${color}"/>`,
-  };
-  const path = PATHS[name] || PATHS['tag'];
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${path}</svg>`;
 }
 
 // ============================================================
@@ -416,15 +397,10 @@ function renderCatFilterGrid() {
   if (!grid) return;
   grid.innerHTML = getAllCategories().map(cat => {
     const isActive = STATE.activeFilter === cat.id;
-    const count = activeCount(cat.id);
     return `<button class="cat-filter-btn ${isActive ? 'active' : ''}"
-      style="--cat-border:${cat.color}55;--cat-glow:${cat.color}22;--cat-fill:${cat.color}0a;"
+      style="background:${cat.color};color:${cat.text}"
       onclick="setMainFilter('${cat.id}')">
-      <div class="cat-icon" style="background:${cat.color}1e">${catIcon(cat.icon || 'tag', cat.color)}</div>
-      <div class="cat-label-row">
-        <span class="cat-filter-label" style="color:${cat.color}">${cat.label}</span>
-        <span class="cat-count ${count > 0 ? 'has-items' : ''}">${count}</span>
-      </div>
+      ${cat.label}
     </button>`;
   }).join('');
 }
@@ -457,7 +433,7 @@ function renderMainItemList() {
       : '';
     const hasMeta = info || !STATE.activeFilter;
 
-    return `<li class="item-row ${item.completed ? 'completed' : ''}" style="--item-accent:${cat.color}" onclick="openDetail('${item.id}')">
+    return `<li class="item-row ${item.completed ? 'completed' : ''}" onclick="openDetail('${item.id}')">
       <div class="item-checkbox" onclick="event.stopPropagation();tapCheckMain('${item.id}')"></div>
       <div class="item-content">
         <div class="item-text">${item.text}</div>
@@ -541,14 +517,11 @@ function saveInlineItem() {
 function renderCategoryView(catId) {
   const cat = getCat(catId);
   const header = document.getElementById('category-header');
-  header.style.background = '';
-  header.style.color      = '';
-  header.style.borderBottomColor = cat.color + '44';
-  const titleEl = document.getElementById('category-title');
-  titleEl.textContent  = cat.label;
-  titleEl.style.color  = cat.color;
+  header.style.background = cat.color;
+  header.style.color      = cat.text;
+  document.getElementById('category-title').textContent = cat.label;
   document.getElementById('category-count-badge').textContent = activeCount(catId);
-  document.getElementById('cat-add-btn').style.color = cat.color;
+  document.getElementById('cat-add-btn').style.color = 'inherit';
   renderItemList(catId);
 }
 
@@ -565,13 +538,12 @@ function renderItemList(catId) {
     return;
   }
 
-  const catColor = getCat(catId).color;
   list.innerHTML = items.map(item => {
     const info   = item.date ? formatDate(item.date) : null;
     const dateLi = info ? `<span class="item-date-tag ${info.cls}">${info.text}</span>` : '';
     const remLi  = item.reminder ? `<span class="item-date-tag">🔔 Påminnelse</span>` : '';
 
-    return `<li class="item-row ${item.completed ? 'completed' : ''}" style="--item-accent:${catColor}" onclick="openDetail('${item.id}')">
+    return `<li class="item-row ${item.completed ? 'completed' : ''}" onclick="openDetail('${item.id}')">
       <div class="item-checkbox" onclick="event.stopPropagation();tapCheck('${item.id}')"></div>
       <div class="item-content">
         <div class="item-text">${item.text}</div>

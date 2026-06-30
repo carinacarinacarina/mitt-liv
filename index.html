@@ -3,30 +3,30 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta name="theme-color" content="#070A14">
+  <meta name="theme-color" content="#FCF3E3">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <title>Vardagsliv:ish</title>
   <link rel="stylesheet" href="style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
 <div id="app">
 
   <nav class="side-nav" id="side-nav">
-    <div class="nav-logo">V<span class="logo-sep">:</span>i</div>
+    <div class="nav-logo">V:i</div>
     <button class="nav-btn active" data-view="dashboard" onclick="showDashboard()">
-      <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg></span>
+      <span class="nav-icon">⊞</span>
       <span class="nav-label">Hem</span>
     </button>
     <button class="nav-btn" data-view="review" onclick="startReview()">
-      <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg></span>
+      <span class="nav-icon">◎</span>
       <span class="nav-label">Revision</span>
     </button>
     <button class="nav-btn" data-view="settings" onclick="showSettings()">
-      <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg></span>
+      <span class="nav-icon">◈</span>
       <span class="nav-label">Inställningar</span>
     </button>
   </nav>
@@ -40,7 +40,7 @@
           <h1 class="app-title">Vardagsliv<span class="title-sep">:</span>ish</h1>
           <p class="header-date" id="header-date"></p>
         </div>
-        <button class="header-action-btn" onclick="startReview()" title="Kvällsrevision"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg></button>
+        <button class="header-action-btn" onclick="startReview()" title="Kvällsrevision">◎</button>
       </header>
 
       <!-- Inline add form -->
@@ -72,10 +72,10 @@
     <!-- CATEGORY VIEW (kept for edit flow) -->
     <div id="view-category" class="view hidden">
       <header class="category-header" id="category-header">
-        <button class="back-btn" onclick="showDashboard()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></button>
+        <button class="back-btn" onclick="showDashboard()">←</button>
         <h2 id="category-title"></h2>
         <span id="category-count-badge" class="count-badge"></span>
-        <button class="header-action-btn" onclick="openModal(STATE.selectedCategory)" id="cat-add-btn" title="Lägg till"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5v14"/></svg></button>
+        <button class="header-action-btn" onclick="openModal(STATE.selectedCategory)" id="cat-add-btn" title="Lägg till">+</button>
       </header>
       <div class="filter-bar">
         <button class="filter-btn active" onclick="setFilter(this,'active')">Aktiva</button>
@@ -92,7 +92,7 @@
           <h1>Kvällsrevision</h1>
           <p class="header-date" id="review-date"></p>
         </div>
-        <button class="header-action-btn" onclick="showDashboard()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+        <button class="header-action-btn" onclick="showDashboard()">✕</button>
       </header>
       <div class="review-content" id="review-content"></div>
     </div>
@@ -101,7 +101,7 @@
     <div id="view-settings" class="view hidden">
       <header class="app-header">
         <div class="header-title"><h1>Inställningar</h1></div>
-        <button class="header-action-btn" onclick="showDashboard()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+        <button class="header-action-btn" onclick="showDashboard()">✕</button>
       </header>
       <div class="settings-content">
         <div class="settings-group">
@@ -219,15 +219,15 @@
   <!-- BOTTOM NAV (mobile) -->
   <nav class="bottom-nav" id="bottom-nav">
     <button class="nav-btn active" data-view="dashboard" onclick="showDashboard()">
-      <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg></span>
+      <span class="nav-icon">⊞</span>
       <span class="nav-label">Hem</span>
     </button>
     <button class="nav-btn" data-view="review" onclick="startReview()">
-      <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg></span>
+      <span class="nav-icon">◎</span>
       <span class="nav-label">Revision</span>
     </button>
     <button class="nav-btn" data-view="settings" onclick="showSettings()">
-      <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg></span>
+      <span class="nav-icon">◈</span>
       <span class="nav-label">Inst.</span>
     </button>
   </nav>
