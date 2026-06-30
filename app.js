@@ -703,10 +703,7 @@ function reviewRow(item) {
       <div class="review-item-text">${item.text}</div>
       ${info ? `<div class="review-item-sub">${info.text}</div>` : ''}
     </div>
-    <div style="display:flex;flex-direction:column;gap:5px;align-items:flex-end;">
-      <button class="review-done-btn" onclick="markReviewDone('${item.id}')">✓ Klar</button>
-      <button class="review-remind-btn" onclick="quickReminder('${item.id}')">+ Påminn</button>
-    </div>
+    <button class="review-done-btn" onclick="markReviewDone('${item.id}')">Klar</button>
   </div>`;
 }
 
