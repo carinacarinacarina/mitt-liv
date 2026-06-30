@@ -4,28 +4,28 @@
 // CATEGORIES
 // ============================================================
 const CATEGORIES = [
-  { id: 'kalender',  label: 'Kalender',  color: '#BDD3CE', text: '#013D5A' },
-  { id: 'räkningar', label: 'Räkningar', color: '#F4A25B', text: '#013D5A' },
-  { id: 'barn',      label: 'Barn',      color: '#708C69', text: '#FCF3E3' },
-  { id: 'inköp',     label: 'Inköp',     color: '#BDD3CE', text: '#013D5A' },
-  { id: 'att-göra',  label: 'Att göra',  color: '#013D5A', text: '#FCF3E3' },
-  { id: 'semester',  label: 'Semester',  color: '#708C69', text: '#FCF3E3' },
-  { id: 'hund',      label: 'Hund',      color: '#F4A25B', text: '#013D5A' },
-  { id: 'tankar',    label: 'Tankar',    color: '#013D5A', text: '#FCF3E3' },
+  { id: 'kalender',  label: 'Kalender',  bg: '#DAEEF9', color: '#4BAFD4', text: '#2A6E8A' },
+  { id: 'räkningar', label: 'Räkningar', bg: '#FFE8DC', color: '#E8805A', text: '#8A4A2A' },
+  { id: 'barn',      label: 'Barn',      bg: '#D8EDDA', color: '#5AB464', text: '#2A6A34' },
+  { id: 'inköp',     label: 'Inköp',     bg: '#E8DEFA', color: '#8A5ADA', text: '#5A3A8A' },
+  { id: 'att-göra',  label: 'Att göra',  bg: '#FEF3DC', color: '#D4A020', text: '#7A5A10' },
+  { id: 'semester',  label: 'Semester',  bg: '#DCF4F0', color: '#3AB4A0', text: '#1A6A5A' },
+  { id: 'hund',      label: 'Hund',      bg: '#FFE8F4', color: '#E05A90', text: '#8A2A5A' },
+  { id: 'tankar',    label: 'Tankar',    bg: '#F0EDFE', color: '#8070C8', text: '#4A3A7A' },
 ];
 
 // ============================================================
 // PRESET COLORS FOR CUSTOM CATEGORIES
 // ============================================================
 const PRESET_COLORS = [
-  { color: '#708C69', text: '#FCF3E3' },
-  { color: '#F4A25B', text: '#013D5A' },
-  { color: '#BDD3CE', text: '#013D5A' },
-  { color: '#013D5A', text: '#FCF3E3' },
-  { color: '#7B5EA7', text: '#FCF3E3' },
-  { color: '#D62839', text: '#FCF3E3' },
-  { color: '#457B9D', text: '#FCF3E3' },
-  { color: '#E9C46A', text: '#013D5A' },
+  { bg: '#DAEEF9', color: '#4BAFD4', text: '#2A6E8A' },
+  { bg: '#FFE8DC', color: '#E8805A', text: '#8A4A2A' },
+  { bg: '#D8EDDA', color: '#5AB464', text: '#2A6A34' },
+  { bg: '#E8DEFA', color: '#8A5ADA', text: '#5A3A8A' },
+  { bg: '#FEF3DC', color: '#D4A020', text: '#7A5A10' },
+  { bg: '#FFE8F4', color: '#E05A90', text: '#8A2A5A' },
+  { bg: '#DCF4F0', color: '#3AB4A0', text: '#1A6A5A' },
+  { bg: '#F0EDFE', color: '#8070C8', text: '#4A3A7A' },
 ];
 let selectedPresetColor = PRESET_COLORS[0];
 
@@ -381,6 +381,9 @@ function setFilter(btn, filter) {
 // RENDER: DASHBOARD
 // ============================================================
 function renderDashboard() {
+  const name = DATA.settings.name;
+  const greetEl = document.getElementById('header-greeting');
+  if (greetEl) greetEl.textContent = name ? `Hej, ${name}!` : 'Hej!';
   document.getElementById('header-date').textContent = svDate();
   renderCatFilterGrid();
   renderMainItemList();
@@ -397,10 +400,14 @@ function renderCatFilterGrid() {
   if (!grid) return;
   grid.innerHTML = getAllCategories().map(cat => {
     const isActive = STATE.activeFilter === cat.id;
+    const count = activeCount(cat.id);
+    const bg = cat.bg || cat.color;
     return `<button class="cat-filter-btn ${isActive ? 'active' : ''}"
-      style="background:${cat.color};color:${cat.text}"
+      style="background:${bg};--cat-active-border:${cat.color}"
       onclick="setMainFilter('${cat.id}')">
-      ${cat.label}
+      <div class="cat-dot" style="background:${cat.color}"></div>
+      <div class="cat-filter-label" style="color:${cat.text}">${cat.label}</div>
+      <div class="cat-count" style="color:${cat.text}">${count}</div>
     </button>`;
   }).join('');
 }
@@ -429,7 +436,7 @@ function renderMainItemList() {
     const info = item.date ? formatDate(item.date) : null;
     const dateTag = info ? `<span class="item-date-tag ${info.cls}">${info.text}</span>` : '';
     const catPill = !STATE.activeFilter
-      ? `<span class="item-cat-pill" style="background:${cat.color};color:${cat.text}">${cat.label}</span>`
+      ? `<span class="item-cat-pill" style="background:${cat.bg || cat.color};color:${cat.text}">${cat.label}</span>`
       : '';
     const hasMeta = info || !STATE.activeFilter;
 
