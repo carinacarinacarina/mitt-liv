@@ -703,8 +703,17 @@ function reviewRow(item) {
       <div class="review-item-text">${item.text}</div>
       ${info ? `<div class="review-item-sub">${info.text}</div>` : ''}
     </div>
-    <button class="review-remind-btn" onclick="quickReminder('${item.id}')">+ Påminn</button>
+    <div style="display:flex;flex-direction:column;gap:5px;align-items:flex-end;">
+      <button class="review-done-btn" onclick="markReviewDone('${item.id}')">✓ Klar</button>
+      <button class="review-remind-btn" onclick="quickReminder('${item.id}')">+ Påminn</button>
+    </div>
   </div>`;
+}
+
+function markReviewDone(id) {
+  updateItem(id, { completed: true });
+  renderReview();
+  showToast('Klart!');
 }
 
 function quickReminder(id) {

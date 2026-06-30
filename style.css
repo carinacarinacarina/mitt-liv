@@ -631,6 +631,13 @@ body {
   align-self: center; font-weight: 700;
 }
 .review-remind-btn:active { opacity: 0.70; }
+.review-done-btn {
+  font-size: 11px; color: #3a7a52; background: rgba(106,191,154,0.13);
+  border: 1px solid rgba(106,191,154,0.30); border-radius: 100px; padding: 5px 12px;
+  cursor: pointer; font-family: 'DM Sans', inherit; flex-shrink: 0; white-space: nowrap;
+  font-weight: 700;
+}
+.review-done-btn:active { opacity: 0.70; }
 .review-empty { text-align: center; padding: 64px 20px; }
 .review-empty-icon { font-size: 46px; margin-bottom: 14px; opacity: 0.18; }
 .review-empty-title { font-size: 22px; font-weight: 800; letter-spacing: -0.02em; color: var(--navy); }
