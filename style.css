@@ -713,6 +713,51 @@ body {
 }
 .add-cat-btn:active { opacity: 0.70; }
 
+/* === STATS === */
+.stats-content { padding: 14px 16px 48px; display: flex; flex-direction: column; gap: 14px; }
+
+.stats-section-title {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.11em;
+  text-transform: uppercase; color: var(--text-muted); margin-bottom: 10px;
+}
+
+.kpi-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+.kpi-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 13px 14px;
+  display: flex; flex-direction: column; gap: 3px;
+  box-shadow: var(--shadow-sm);
+}
+.kpi-label {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--text-muted);
+  display: flex; align-items: center; gap: 5px;
+}
+.kpi-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.kpi-value { font-size: 26px; font-weight: 800; letter-spacing: -0.03em; line-height: 1.1; }
+.kpi-sub { font-size: 11px; font-weight: 500; color: var(--text-muted); }
+
+.stats-chart-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 14px 16px;
+  box-shadow: var(--shadow-sm);
+}
+
+.stats-bar-chart {
+  display: flex; align-items: flex-end; gap: 5px; height: 72px; margin-top: 4px;
+}
+.bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 5px; }
+.bar-fill { width: 100%; border-radius: 5px 5px 0 0; min-height: 3px; }
+.bar-label { font-size: 9px; font-weight: 600; color: var(--text-muted); }
+
+.stats-cat-bars { display: flex; flex-direction: column; gap: 9px; margin-top: 4px; }
+.cat-row { display: flex; align-items: center; gap: 8px; }
+.cat-name { font-size: 11px; font-weight: 700; color: var(--text); width: 64px; flex-shrink: 0; }
+.cat-track { flex: 1; height: 8px; background: var(--border); border-radius: 100px; overflow: hidden; }
+.cat-bar { height: 100%; border-radius: 100px; transition: width 0.4s ease; }
+.cat-num { font-size: 11px; font-weight: 700; color: var(--text-muted); width: 20px; text-align: right; flex-shrink: 0; }
+
 /* === DESKTOP ≥ 768px === */
 @media (min-width: 768px) {
   #app {

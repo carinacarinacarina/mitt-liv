@@ -285,6 +285,101 @@ function showCategory(catId) {
   renderCategoryView(catId);
 }
 
+function showStats() {
+  showView('stats');
+  setActiveNav('stats');
+  renderStats();
+}
+
+function renderStats() {
+  const dateEl = document.getElementById('stats-date');
+  if (dateEl) dateEl.textContent = svDate();
+
+  const items = DATA.items;
+  const total = items.length;
+
+  const catCounts = {};
+  getAllCategories().forEach(c => { catCounts[c.id] = 0; });
+  items.forEach(x => {
+    if (catCounts[x.category] !== undefined) catCounts[x.category]++;
+    else catCounts[x.category] = 1;
+  });
+
+  const sorted = getAllCategories()
+    .map(c => ({ cat: c, count: catCounts[c.id] || 0 }))
+    .filter(x => x.count > 0)
+    .sort((a, b) => b.count - a.count);
+
+  const top3 = sorted.slice(0, 3);
+  const maxCount = sorted.length ? sorted[0].count : 1;
+
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const days = Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(today);
+    d.setDate(today.getDate() - 6 + i);
+    return d;
+  });
+  const dayLabels = ['Mån','Tis','Ons','Tor','Fre','Lör','Sön'];
+  const dayCounts = days.map(d => {
+    const ds = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    return items.filter(x => x.createdAt && x.createdAt.startsWith(ds)).length;
+  });
+  const maxDay = Math.max(...dayCounts, 1);
+
+  const kpiExtra = top3.map((x, i) => `
+    <div class="kpi-card">
+      <div class="kpi-label"><span class="kpi-dot" style="background:${x.cat.color}"></span>${x.cat.label}</div>
+      <div class="kpi-value" style="color:${x.cat.color}">${x.count}</div>
+      <div class="kpi-sub">#${i+1} mest använd</div>
+    </div>`).join('');
+
+  const barCols = days.map((d, i) => {
+    const h = Math.round((dayCounts[i] / maxDay) * 60);
+    const isToday = d.getTime() === today.getTime();
+    return `<div class="bar-col">
+      <div class="bar-fill" style="height:${Math.max(h,3)}px;background:${isToday ? 'var(--pink)' : '#DAEEF9'}"></div>
+      <div class="bar-label">${dayLabels[d.getDay() === 0 ? 6 : d.getDay()-1]}</div>
+    </div>`;
+  }).join('');
+
+  const catBarRows = sorted.map(x => {
+    const pct = Math.round((x.count / maxCount) * 100);
+    return `<div class="cat-row">
+      <div class="cat-name">${x.cat.label}</div>
+      <div class="cat-track"><div class="cat-bar" style="width:${pct}%;background:${x.cat.color}"></div></div>
+      <div class="cat-num">${x.count}</div>
+    </div>`;
+  }).join('');
+
+  const emptyState = total === 0
+    ? `<div class="empty-state">Lägg till lite objekt så fylls statistiken på!</div>`
+    : '';
+
+  document.getElementById('stats-content').innerHTML = emptyState || `
+    <div class="stats-section">
+      <div class="stats-section-title">Översikt</div>
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-label">Totalt</div>
+          <div class="kpi-value" style="color:var(--navy)">${total}</div>
+          <div class="kpi-sub">objekt</div>
+        </div>
+        ${kpiExtra}
+      </div>
+    </div>
+
+    <div class="stats-chart-card">
+      <div class="stats-section-title">Tillagt senaste 7 dagarna</div>
+      <div class="stats-bar-chart">${barCols}</div>
+    </div>
+
+    <div class="stats-chart-card">
+      <div class="stats-section-title">Alla kategorier</div>
+      <div class="stats-cat-bars">${catBarRows || '<div class="kpi-sub">Inga objekt ännu</div>'}</div>
+    </div>
+  `;
+}
+
 function showSettings() {
   showView('settings');
   setActiveNav('settings');
